@@ -1,4 +1,8 @@
-# ORB-SLAM2
+# OA-SLAM-YOLOv8
+
+This is a fork of OA-SLAM to support YOLOv8 and some other benchmarking processes added for the purpose of my undergraduate thesis, if you interested more about the original code, you can check the links down below.
+
+- [Source Code](https://gitlab.inria.fr/tangram/oa-slam)
 
 **Associated Publication:**
 - **OA-SLAM: Leveraging Objects for Camera Relocalization in Visual SLAM.** Matthieu Zins, Gilles Simon, Marie-Odile Berger, *IEEE International Symposium on Mixed and Augmented Reality (ISMAR 2022).* [Paper](https://arxiv.org/abs/2209.08338) | [Video](https://youtu.be/L1HEL4kLJ3g) | [AR Demo](https://youtu.be/PXG_6LkbtgY)
