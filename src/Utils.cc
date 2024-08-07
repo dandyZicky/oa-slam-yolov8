@@ -46,3 +46,23 @@ void writeOBJ(const std::string& filename, const Eigen::Matrix<double, Eigen::Dy
 
 
 }
+
+std::unordered_map<std::string, std::shared_ptr<std::ofstream>>
+    FileManager::fileWriter;
+
+void FileManager::closeAll() {
+  for (auto it = fileWriter.begin(); it != fileWriter.end(); it++){
+    it->second->close();
+  }
+}
+
+FileManager::FileManager(std::string name) : _fileName(name) {
+  if (fileWriter.find(name) == fileWriter.end()) {
+    fileWriter[name] = std::make_shared<std::ofstream>(name);
+    *fileWriter[name] << "n_frame,duration_ms\n";
+  }
+}
+
+FileManager::~FileManager() {}
+std::string output_folder = "";
+

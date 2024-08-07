@@ -154,9 +154,9 @@ void ARViewer::Run()
 
     double w = w_;
     double h = h_;
-    pangolin::CreateWindowAndBind("ORB-SLAM2: AR Viewer", w, h);
+        pangolin::CreateWindowAndBind("ORB-SLAM2: AR Viewer", w, h);
 
-    // 3D Mouse handler requires depth testing to be enabled
+        // 3D Mouse handler requires depth testing to be enabled
     glEnable(GL_DEPTH_TEST);
 
     // Issue specific OpenGl we might need
@@ -181,7 +181,8 @@ void ARViewer::Run()
     RenderMode current_mode = RenderMode::color;
     pangolin::AxisDirection spin_direction = pangolin::AxisNone;
     std::vector<std::future<pangolin::Geometry>> geom_to_load;
-    std::vector<std::string>  fn = {"../Data/ball.ply"};
+    // std::vector<std::string>  fn = {"../Data/ball.ply"};
+    std::vector<std::string>  fn = {"/home/dandy/Projects/OA-SLAM/Data/ball.ply"};
      for(const auto& filename : fn)
     {
         geom_to_load.emplace_back(std::async(std::launch::async,[filename](){

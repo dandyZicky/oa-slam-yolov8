@@ -20,6 +20,7 @@
 
 #include "LocalObjectMapping.h"
 
+#include <cstdint>
 #include<mutex>
 #include <unistd.h>
 
@@ -30,6 +31,7 @@
 #include "Optimizer.h"
 #include "OptimizerObject.h"
 #include "MapObject.h"
+#include "Utils.h"
 
 
 namespace ORB_SLAM2
@@ -60,6 +62,11 @@ void LocalObjectMapping::Run()
         // For now LocalObjectMapping always accept newly modified objects
 
         // while ... do reconstruction
+        
+        FileManager reconstruction_timer_csv(output_folder + "total_reconstruction_time.csv");
+        Timer reconstruction_timer;
+        static uint16_t timer_idx {};
+        reconstruction_timer.start();
         while (!modified_objects_.empty()) {
 
             MapObject *obj = modified_objects_.front();
@@ -114,6 +121,9 @@ void LocalObjectMapping::Run()
                 modified_objects_set_.erase(obj);
             }
         }
+        
+        reconstruction_timer_csv << timer_idx << ',' << reconstruction_timer.stop() << '\n';
+        timer_idx++;
 
 
         if(Stop())

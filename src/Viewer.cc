@@ -100,11 +100,11 @@ void Viewer::Run()
     pangolin::Var<bool> menuShowGraph("menu.Show Graph",true,true);
     pangolin::Var<bool> menuLocalizationMode("menu.Localization Mode",false,true);
     pangolin::Var<bool> menuReset("menu.Reset",false,false);
-    pangolin::Var<bool> menuPause("menu.Pause",false,true);
+    pangolin::Var<bool> menuPause("menu.Pause",true,true);
     pangolin::Var<bool> menuCatCol("menu.Color by Cat", false, true);
     pangolin::Var<bool> menu3DBbox("menu.Disp 3D Bboxes", false, true);
     pangolin::Var<bool> menuDistEstim("menu.Disp Distance Est.", false, true);
-    pangolin::Var<bool> menuDispARModels("menu.Disp AR Models", true, true);
+    pangolin::Var<bool> menuDispARModels("menu.Disp AR Models", false, true);
     pangolin::Var<bool> menuARFixSize("menu.Fixed AR size", true, true);
     pangolin::Var<bool> menuQuit("menu.Quit",false,false);
 

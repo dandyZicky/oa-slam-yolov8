@@ -89,6 +89,10 @@ private:
     json data_;
 };
 
+// Temporary macro
+#ifdef __INTELLISENSE__
+    #define USE_DNN
+#endif
 
 #ifdef USE_DNN
 class ObjectDetector : public ImageDetectionsManager
@@ -113,6 +117,8 @@ private:
     // cv::dnn::Net network_;
     std::unique_ptr<cv::dnn::Net> network_;
     std::unordered_set<int> ignored_cats_;
+    int INPUT_WIDTH_ {};
+    int INPUT_HEIGHT_ {};
 };
 #else
 class ObjectDetector : public ImageDetectionsManager

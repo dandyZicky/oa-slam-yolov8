@@ -352,13 +352,19 @@ cv::Mat Tracking::GrabImageMonocular(const cv::Mat &im, const double &timestamp,
     }
     else
     {
+        FileManager tracking_timer_csv(output_folder + "tracking_timer.csv");
+        Timer tracking_timer;
+        tracking_timer.start();
         Track();
+        // std::cout << "Tracking time: " << tracking_timer.stop() << " ms" << '\n';
+        tracking_timer_csv << current_frame_idx_ << ',' << tracking_timer.stop() << '\n';
 
         // if (!mbOnlyTracking)    // if in localization-only mode, no neeed to track objects
         //     break;
 
         /////////////////////////////////// Objects Tracking ///////////////////////////////////
         // Update mean depth
+        FileManager mean_depth_csv(output_folder + "mean_depth.csv");
         if (mState == Tracking::OK) {
             Matrix34d Rt = cvToEigenMatrix<double, float, 3, 4>(mCurrentFrame.mTcw);
             double z_mean = 0.0;
@@ -377,11 +383,12 @@ cv::Mat Tracking::GrabImageMonocular(const cv::Mat &im, const double &timestamp,
             // std::cout << "Mean depth = " << z_mean << "\n";
             current_mean_depth_ = z_mean;
         }
+        // std::cout << "Depth Estimation Time: " << mean_depth_estimation_time.stop() << " ms" << '\n';
 
-        std::cout << "Frame " << current_frame_idx_ << " ===========\n";
+        // std::cout << "Frame " << current_frame_idx_ << " ===========\n";
         // std::cout << "Created new KF: " << createdNewKeyFrame_ << "\n";
-        std::cout << "Nb Object Tracks: " << objectTracks_.size() << "\n";
-        std::cout << "Nb Map Objects  : " << mpMap->GetNumberMapObjects() << "\n";
+        // std::cout << "Nb Object Tracks: " << objectTracks_.size() << "\n";
+        // std::cout << "Nb Map Objects  : " << mpMap->GetNumberMapObjects() << "\n";
         // for (auto tr : objectTracks_) {
         //     std::cout << "    - tr " << tr->GetId() << " : " << tr->GetNbObservations() << "\n";
         // }
@@ -393,6 +400,9 @@ cv::Mat Tracking::GrabImageMonocular(const cv::Mat &im, const double &timestamp,
 
         BBox2 img_bbox(0, 0, im.cols, im.rows);
 
+        FileManager total_tracking_time(output_folder + "total_tracking_time.csv");
+        Timer total_tracking;
+        total_tracking.start();
         if (mState == Tracking::OK) {
 
             // Keep only detections with a certain score
@@ -551,7 +561,7 @@ cv::Mat Tracking::GrabImageMonocular(const cv::Mat &im, const double &timestamp,
                         // assigned to non-existing => means not assigned
                         auto tr = ObjectTrack::CreateNewObjectTrack(det->category_id, det->bbox, det->score, Rt,
                                                                     current_frame_idx_, this, kf);
-                        // std::cout << "create new track " << tr->GetId() << "\n";
+                        // std::cout << "create new track " << tr->GetId() << " at: " << current_frame_idx_ << "\n";
                         new_tracks.push_back(tr);
                     } else {
                         ObjectTrack::Ptr associated_track = possible_tracks[assigned_track_idx];
@@ -569,6 +579,9 @@ cv::Mat Tracking::GrabImageMonocular(const cv::Mat &im, const double &timestamp,
 
 
                 if (!mbOnlyTracking) {
+                    FileManager reconstruction_total_csv(output_folder + "reconstruction_total.csv");
+                    Timer reconstruction_total; // Total duration of initializing reconstruction and optimization of ellipsoids
+                    reconstruction_total.start();
                     for (auto& tr : objectTracks_) {
                         if (tr->GetLastObsFrameId() == current_frame_idx_) {
                             // Try reconstruct from points
@@ -590,9 +603,10 @@ cv::Mat Tracking::GrabImageMonocular(const cv::Mat &im, const double &timestamp,
                             tr->OptimizeReconstruction(mpMap);
                             // std::cout << "First opimitzation done.\n";
                             auto checked = tr->CheckReprojectionIoU(0.3);
-                            // std::cout << "Check reprojection " << checked << ".\n";
                             if (checked) {
                                 // Add object to map
+                                FileManager reprojected_object(output_folder + "first_3d_object.csv");
+                                reprojected_object << tr->GetCategoryId() << ',' << current_frame_idx_ << '\n';
                                 tr->InsertInMap(mpMap);
                                 // Add object in the local object mapping thread to run a fusion checking
                                 if (local_object_mapper_)
@@ -602,6 +616,8 @@ cv::Mat Tracking::GrabImageMonocular(const cv::Mat &im, const double &timestamp,
                             }
                         }
                     }
+                    // std::cout << "Reconstruction and Possibly optimization took: " << reconstruction_total.stop() << " ms" << '\n';
+                    reconstruction_total_csv << current_frame_idx_ << ',' << reconstruction_total.stop() << '\n';
                 }
             }
 
@@ -627,6 +643,8 @@ cv::Mat Tracking::GrabImageMonocular(const cv::Mat &im, const double &timestamp,
 
         // std::cout << "Object Tracks: " << objectTracks_.size() << "\n";
         mpFrameDrawer->Update(this);
+        // std::cout << "Total Tracking Time: " << total_tracking.stop() << " \ms" << '\n';
+        total_tracking_time << current_frame_idx_ << ',' << total_tracking.stop() << '\n';
     }
 
     if (mpARViewer) { // Update AR viewer camera
@@ -722,7 +740,7 @@ void Tracking::Track()
                 if (bOK)
                     std::cout << "Relocalization is OK\n";
                 else {
-                    std::cout << "Relocalization failed\n";
+                    // std::cout << "Relocalization failed\n";
                 }
             }
         }

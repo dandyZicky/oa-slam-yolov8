@@ -190,7 +190,7 @@ public:
     std::pair<std::unordered_map<KeyFrame*, BBox2,
                        std::hash<KeyFrame*>,
                        std::equal_to<KeyFrame*>,
-                       Eigen::aligned_allocator<std::pair<KeyFrame const*, BBox2>>>, 
+                       Eigen::aligned_allocator<std::pair<KeyFrame* const, BBox2>>>, 
                        std::unordered_map<KeyFrame*, double>>
     CopyDetectionsMapInKeyFrames() const {
         unique_lock<mutex> lock(mutex_add_detection_);
@@ -247,7 +247,7 @@ public:
     std::unordered_map<KeyFrame*, BBox2,
                        std::hash<KeyFrame*>,
                        std::equal_to<KeyFrame*>,
-                       Eigen::aligned_allocator<std::pair<KeyFrame const*, BBox2>>> keyframes_bboxes_;
+                       Eigen::aligned_allocator<std::pair<KeyFrame* const, BBox2>>> keyframes_bboxes_;
     std::unordered_map<KeyFrame*, double> keyframes_scores_;
     
     mutable std::mutex mutex_add_detection_;

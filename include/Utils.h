@@ -22,12 +22,62 @@
 #define UTILS_H
 
 #include <Eigen/Dense>
+#include <cstdint>
+#include <memory>
 #include <opencv2/core.hpp>
 #include <unordered_set>
 #include <unordered_map>
+#include <chrono>
+#include <fstream>
+#include <utility>
 
 #define TO_RAD(x) 0.01745329251 * (x)
 #define TO_DEG(x) 57.2957795131 * (x)
+
+extern std::string output_folder;
+
+class Timer {
+public:
+    void start() {
+        start_time_point = std::chrono::high_resolution_clock::now();
+    }
+
+    long stop() {
+        auto end_time_point = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::time_point_cast<std::chrono::milliseconds>(start_time_point).time_since_epoch().count();
+        auto end = std::chrono::time_point_cast<std::chrono::milliseconds>(end_time_point).time_since_epoch().count();
+
+        auto duration = end - start;
+        return duration;
+    }
+
+private:
+    std::chrono::time_point<std::chrono::high_resolution_clock> start_time_point;
+};
+
+class FileManager {
+public:
+  FileManager(std::string name);
+  ~FileManager();
+
+  static std::unordered_map<std::string, std::shared_ptr<std::ofstream>>
+      fileWriter;
+
+  static void closeAll();
+
+  // Templates
+  template <typename T> FileManager &operator<<(const T &data);
+
+private:
+  const std::string _fileName;
+};
+
+template <typename T> FileManager &FileManager::operator<<(const T &data) {
+  if (fileWriter.at(_fileName) && fileWriter.at(_fileName)->is_open()) {
+    *fileWriter.at(_fileName) << data;
+  }
+  return *this;
+}
 
 
 // Extract the extension of a file without the '.'
